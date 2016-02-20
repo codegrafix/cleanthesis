@@ -1,59 +1,35 @@
+%% cleanthesis.sty
+%% Copyright 2015 R. Langner
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is R. Langner.
+%
+% This work consists of all files listed in MANIFEST.md.
+%
+%
 % **************************************************
+%
 % Clean Thesis
 % -- A LaTeX Style for Thesis Documents --
 %
-% Copyright (C) 2011-2015 Ricardo Langner
 % **************************************************
 %
 % Readme:
 % ----------------------------------------
-% *** Clean, Simple, Elegant ***
-% "Clean Thesis" is a LaTeX style for thesis documents, developed
-% for my diplom thesis (Diplomarbeit). The style can be understood
-% as my personal compromise - a typical clean looking scientific
-% document combined and polished with minor beautifications.
+% Please check out the README.md file in the root of this package.
 %
-% The design of this "Clean Thesis" style is inspired
-% by user guide documents from Apple Inc.
-%
-% Note: If you are looking for an exact and correct style regarding
-% typographic rules, please have a look at the "Classic Thesis Style"
-% (see http://www.miede.de/index.php?page=classicthesis).
-%
-% *** Donation = Postcard ***
-% Based on the idea of Andr\'e Miede: If you like the "Clean Thesis"
-% style I would be very pleased about a donation in the form of a
-% POSTCARD. You can find my address at http://cleanthesis.der-ric.de/
-% as well as in the file Clean-Thesis.pdf. I am going to collect all
-% postcards and exhibit them at the website I mentioned.
-%
-% *** Idea and Inspiration ***
-% The idea of providing my customized style for thesis documents
-% passed through my mind while writing my own thesis. Motivated and
-% inspired by the superb "Classic Thesis Style"
-% (see http://www.miede.de/index.php?page=classicthesis) by Andr\'e Miede
-% (thanks to Andr\'e for doing a great job) I decided to collect all
-% design and style related functionality in a separate LaTeX style and
-% provide this style to other thesis writers.
-%
-%
-% License Information:
-% ----------------------------------------
-% "Clean Thesis" is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
-%
-% "Clean Thesis" is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
-%
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
 % **************************************************
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{cleanthesis}[2013/05/12 v0.3 Clean-looking thesis style inspired by Apple's user guide documents]
+\ProvidesPackage{cleanthesis}[2015/08/26 v0.3.1 A clean LaTeX style for thesis documents]
 %
 % **************************************************
 % Package options
@@ -116,6 +92,10 @@
 \define@choicekey*[ct]{cthesis}{bibstyle}[\val\bibstylenr]{alphabetic,numeric,authoryear}[alphabetic]{\def\cthesis@bibstyle{#1}}
 \setkeys[ct]{cthesis}{bibstyle=alphabetic}
 
+% OPTION wrapfooter
+% --> values = true|false
+\define@boolkey[ct]{cthesis}{wrapfooter}[false]{}
+\setkeys[ct]{cthesis}{wrapfooter=false}
 
 \DeclareOptionX*{
 	\PackageWarning{cleanthesis}{Unknown option ‘\CurrentOption’}%
@@ -144,6 +124,7 @@
 	\colorlet{ctcolorfootermark}{ctcolorblack}
 	\colorlet{ctcolorfootertitle}{ctcolormain}
 	% -- sectioning colors
+	\colorlet{ctcolortitle}{ctcolormain}
 	\colorlet{ctcolorpartnum}{ctcolormain}
 	\colorlet{ctcolorpartline}{ctcolorblack}
 	\colorlet{ctcolorparttext}{ctcolorblack}
@@ -175,6 +156,7 @@
 		\colorlet{ctcolorfooterline}{ctcolorgray}
 		\colorlet{ctcolorfootertitle}{ctcolorgray}
 		% --> sectioning colors
+		\colorlet{ctcolortitle}{ctcolorblack}
 		\colorlet{ctcolorpartnum}{ctcolorblack}
 		\colorlet{ctcolorchapternum}{ctcolorblack}
 		\colorlet{ctcolorchapterline}{ctcolorblack}
@@ -250,10 +232,10 @@
 % **************************************************
 % Load Packages
 % **************************************************
-\RequirePackage{fixltx2e}			% packages provides fixes to LaTeX2e
 \RequirePackage{microtype}			% typographic tuning
 \RequirePackage{setspace}			% for line spacing, e.g. \onehalfspacing
 \RequirePackage[]{graphicx}			% graphics import features
+\RequirePackage{tabularx}			% table features
 \RequirePackage{fancyhdr}			% for header and footer modifications
 \RequirePackage{enumitem}			% for simple list modifications
 \RequirePackage{blindtext}		% package for blind text
@@ -383,7 +365,11 @@
 		\footnotesize%
 		{\color{ctcolorfootermark}\textbf{\chaptername\ \thechapter}}%
 		\quad%
-		{\color{ctcolorfootertitle}#1}%
+		\ifct@cthesis@wrapfooter%
+			{\color{ctcolorfootertitle}\protect\parbox[t]{.7\textwidth}{#1}}%
+		\else%
+			{\color{ctcolorfootertitle}#1}%
+		\fi%
 	}{}%
 }
 \renewcommand{\sectionmark}[1]{%
@@ -648,6 +634,12 @@
 % The tocloft package enables us to control the typographic design of the
 % table of contents, list of figures and list of tables
 \RequirePackage{tocloft}
+% - fixes wrong fonts in the toc, thanks to magnucki
+\renewcommand{\cftchapfont}{\usefont{T1}{bch}{b}{n}\selectfont}
+\renewcommand{\cfttoctitlefont}{\thesischapterfont}
+\renewcommand{\cftloftitlefont}{\thesischapterfont}
+\renewcommand{\cftlottitlefont}{\thesischapterfont}
+%
 %
 % > adjusts the indention for figure and table entries (lof and lot)
 %   -- \cftsetindents{entry}{indent}{numwidth} sets the entry's indent to
